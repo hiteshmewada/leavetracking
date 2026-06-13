@@ -6,15 +6,13 @@ import com.employees.leavetracker.entity.LeaveRequest;
 import com.employees.leavetracker.entity.LeaveType;
 import com.employees.leavetracker.entity.User;
 import com.employees.leavetracker.enums.LeaveRequestStatus;
+import com.employees.leavetracker.exception.ResourceNotFoundException;
 import com.employees.leavetracker.repository.LeaveRepository;
 import com.employees.leavetracker.repository.LeaveTypeRepository;
 import com.employees.leavetracker.repository.UserRepository;
 import com.employees.leavetracker.service.LeaveRequestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Service;
-
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 @Service
@@ -25,8 +23,6 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private final UserRepository userRepository;
     private final LeaveTypeRepository leaveTypeRepository;
 
-//    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
     @Override
     public LeaveResponseDto applyForLeave(LeaveRequestDto leaveRequestDto) {
         LeaveRequest leaveRequest = new LeaveRequest();
@@ -35,18 +31,19 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         leaveRequest.setReason(leaveRequestDto.getLeaveReason());
         leaveRequest.setStatus(LeaveRequestStatus.PENDING);
 
-        User user = userRepository.findById(leaveRequestDto.getUserId()).orElse(null);
+        User user = userRepository.findById(leaveRequestDto.getUserId()).orElseThrow(
+                () -> new ResourceNotFoundException("User not found"));
         leaveRequest.setUser(user);
 
         LeaveType leaveType = leaveTypeRepository.findById(leaveRequestDto.getLeaveTypeId())
-                .orElseThrow(() -> new RuntimeException("Leave Type Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Leave Type Not Found"));
 
         leaveRequest.setLeaveType(leaveType);
         LeaveRequest savedLeave = leaveRepository.save(leaveRequest);
 
         double leaveDays = ChronoUnit.DAYS.between(leaveRequest.getStartDate(), leaveRequest.getEndDate()) + 1;
 
-        String employeeName = user!=null ? user.getFullName() : "Anonymous";
+        String employeeName = user.getFullName();
 
         return new LeaveResponseDto(savedLeave.getLeaveId(), savedLeave.getUser().getId(),
                 savedLeave.getStartDate(),

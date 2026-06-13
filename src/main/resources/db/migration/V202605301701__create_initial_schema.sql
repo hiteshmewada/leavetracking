@@ -1,13 +1,13 @@
 CREATE TABLE users
 (
-    id         BIGINT PRIMARY KEY AUTOINCREMENT,
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     fullName  TEXT        NOT NULL,
     email      TEXT unique NOT NULL,
     department varchar(100)
 );
 CREATE TABLE leave_types
 (
-    id       BIGINT PRIMARY KEY AUTOINCREMENT,
+    id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     leave_name     TEXT    NOT NULL,
     max_days_per_year INTEGER NOT NULL,
     is_paid   boolean
@@ -15,9 +15,9 @@ CREATE TABLE leave_types
 
 CREATE TABLE leave_requests
 (
-    leave_id      BIGINT PRIMARY KEY AUTOINCREMENT,
-    start_date    TEXT,
-    end_date      TEXT,
+    leave_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    start_date    DATE NOT NULL ,
+    end_date      DATE NOT NULL ,
     reason        TEXT,
     status        TEXT DEFAULT 'PENDING',
     user_id       BIGINT NOT NULL,
