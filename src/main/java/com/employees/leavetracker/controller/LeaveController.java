@@ -15,9 +15,8 @@ public class LeaveController {
     private final LeaveRequestService leaveRequestService;
 
     @GetMapping("/users/{userId}/balance")
-    public String leave(@PathVariable String userId){
-        return userId;
-    }
+//    public Integer leave(@PathVariable Integer userId){
+//    }
 
     @PostMapping("/api/leaves/apply")
     public ResponseEntity<LeaveResponseDto> applyLeave(@Valid @RequestBody LeaveRequestDto leaveRequestDto){
